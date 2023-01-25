@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pywikidata"
+version = "0.1.2"
+description = "Python Wrapper for Wikidata KG"
+authors = ["Mikhail Salnikov"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+joblib = "^1.2.0"
+requests = "^2.28.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
