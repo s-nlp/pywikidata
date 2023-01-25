@@ -14,7 +14,7 @@ class _WikiDataBase:
 
 class _WikiDataSPARQLBase(_WikiDataBase):
     @staticmethod
-    def _request_one_hop_neighbors(entity_id):
+    def _request_one_hop_neighbours(entity_id):
         query = """
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX schema: <http://schema.org/>
@@ -30,7 +30,7 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         return responce
 
     @staticmethod
-    def _request_one_hop_neighbors_with_instance_of(entity_id):
+    def _request_one_hop_neighbours_with_instance_of(entity_id):
         query = """
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -52,7 +52,7 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         return responce
 
     @staticmethod
-    def _request_forward_one_hop_neighbors_with_instance_of(entity_id):
+    def _request_forward_one_hop_neighbours_with_instance_of(entity_id):
         query = """
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -69,7 +69,7 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         return responce
 
     @staticmethod
-    def _request_backward_one_hop_neighbors_with_instance_of(entity_id):
+    def _request_backward_one_hop_neighbours_with_instance_of(entity_id):
         query = """
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -161,8 +161,8 @@ class Entity(_WikiDataSPARQLBase):
                 )
 
             self._label = None
-            self._forward_one_hop_neighbors = None
-            self._backward_one_hop_neighbors = None
+            self._forward_one_hop_neighbours = None
+            self._backward_one_hop_neighbours = None
             self._instance_of = None
             self.is_property = self.idx[0] == "P"
 
@@ -193,37 +193,37 @@ class Entity(_WikiDataSPARQLBase):
         return self._label
 
     @property
-    def forward_one_hop_neighbors(self):
-        if self._forward_one_hop_neighbors is None:
-            responce = self._request_forward_one_hop_neighbors_with_instance_of(
+    def forward_one_hop_neighbours(self):
+        if self._forward_one_hop_neighbours is None:
+            responce = self._request_forward_one_hop_neighbours_with_instance_of(
                 self.idx
             )
-            self._forward_one_hop_neighbors = (
-                Entity._process_one_hop_neighbots_with_instance_of(responce)
+            self._forward_one_hop_neighbours = (
+                Entity._process_one_hop_neighbours_with_instance_of(responce)
             )
-        return self._forward_one_hop_neighbors
+        return self._forward_one_hop_neighbours
 
     @property
-    def backward_one_hop_neighbors(self):
-        if self._backward_one_hop_neighbors is None:
-            responce = self._request_backward_one_hop_neighbors_with_instance_of(
+    def backward_one_hop_neighbours(self):
+        if self._backward_one_hop_neighbours is None:
+            responce = self._request_backward_one_hop_neighbours_with_instance_of(
                 self.idx
             )
-            self._backward_one_hop_neighbors = (
-                Entity._process_one_hop_neighbots_with_instance_of(responce)
+            self._backward_one_hop_neighbours = (
+                Entity._process_one_hop_neighbours_with_instance_of(responce)
             )
-        return self._backward_one_hop_neighbors
+        return self._backward_one_hop_neighbours
 
     @property
-    def one_hop_neighbors(self):
-        return self.forward_one_hop_neighbors + self.backward_one_hop_neighbors
+    def one_hop_neighbours(self):
+        return self.forward_one_hop_neighbours + self.backward_one_hop_neighbours
 
     @staticmethod
-    def _process_one_hop_neighbots_with_instance_of(
-        one_hop_neighbors_with_instance_of_responce,
+    def _process_one_hop_neighbours_with_instance_of(
+        one_hop_neighbours_with_instance_of_responce,
     ):
-        _one_hop_neighbors = []
-        for r in one_hop_neighbors_with_instance_of_responce:
+        _one_hop_neighbours = []
+        for r in one_hop_neighbours_with_instance_of_responce:
             try:
                 property = Entity(r["property"]["value"])
                 neighbor = Entity(r["object"]["value"])
@@ -239,9 +239,9 @@ class Entity(_WikiDataSPARQLBase):
             except ValueError:
                 continue
 
-            if (property, neighbor) not in _one_hop_neighbors:
-                _one_hop_neighbors.append((property, neighbor))
-        return _one_hop_neighbors
+            if (property, neighbor) not in _one_hop_neighbours:
+                _one_hop_neighbours.append((property, neighbor))
+        return _one_hop_neighbours
 
     @property
     def instance_of(self):
