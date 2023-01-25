@@ -132,6 +132,15 @@ class _WikiDataSPARQLBase(_WikiDataBase):
 
 
 class Entity(_WikiDataSPARQLBase):
+    """Entity - python wrapper for Wikidata entities and properties
+    Works like Fabric of Singletones,
+    it's mean that two object with same entity_identifier absolutly equal and it's same object.
+    For example, if you request label for one of them, for second it will available without addition http request.
+
+    Args:
+        entity_identifier: str - URI or ID of entity or property, for example: Q90
+    """
+
     __instances = {}
 
     def __new__(cls, entity_identifier, *args, **kwargs):
@@ -141,7 +150,7 @@ class Entity(_WikiDataSPARQLBase):
             cls.__instances[entity_identifier] = obj
         return cls.__instances[entity_identifier]
 
-    def __init__(self, entity_identifier):
+    def __init__(self, entity_identifier: str):
         entity_identifier = Entity.entity_identifier_to_id(entity_identifier)
         if not hasattr(self, "idx"):
             if self._validate_entity_id(entity_identifier):
@@ -158,7 +167,10 @@ class Entity(_WikiDataSPARQLBase):
             self.is_property = self.idx[0] == "P"
 
     @classmethod
-    def from_label(cls, label):
+    def from_label(cls, label: str):
+        """
+        Returns list of entities with corresponding label
+        """
         responce = cls._request_entity_by_label(label)
         if len(responce) > 0:
             return [Entity(r["item"]["value"]) for r in responce]
@@ -247,13 +259,21 @@ class Entity(_WikiDataSPARQLBase):
             return f"<Entity: {self.idx}>"
 
     @staticmethod
-    def entity_identifier_to_id(entity_identifier):
+    def entity_identifier_to_id(entity_identifier: str) -> str:
+        """entity_identifier_to_id - helper for formatting entity_identifier to index
+
+        Args:
+            entity_identifier: str - URI or Id of Wikidata Entity or Property
+
+        Returns:
+            str - Formatted entity_identifier
+        """
         if "http" in entity_identifier:
             return Entity._entity_uri_to_id(entity_identifier)
         return entity_identifier.upper()
 
     def __json__(self):
         return {
-            "idx": self._idx,
+            "idx": self.idx,
             "_label": self._label,
         }
