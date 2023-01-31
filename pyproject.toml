@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pywikidata"
-version = "0.1.5"
+version = "0.1.6"
 description = "Python Wrapper for Wikidata KG"
 authors = ["Mikhail Salnikov"]
 license = "MIT"

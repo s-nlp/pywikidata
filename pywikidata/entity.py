@@ -125,7 +125,7 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         SELECT ?description
         WHERE 
         {
-            wd:Q3 schema:description ?description.
+            wd:<ENTITY> schema:description ?description.
             FILTER ( lang(?description) = "en" )
         }
         """.replace(
