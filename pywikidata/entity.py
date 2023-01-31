@@ -117,6 +117,38 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         return responce
 
     @staticmethod
+    def _request_description(entity_id):
+        query = """
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX schema: <http://schema.org/>
+
+        SELECT ?description
+        WHERE 
+        {
+            wd:Q3 schema:description ?description.
+            FILTER ( lang(?description) = "en" )
+        }
+        """.replace(
+            "<ENTITY>", entity_id
+        )
+        responce = request_to_wikidata(query)
+        return responce
+
+    @staticmethod
+    def _request_image(entity_id):
+        query = """
+        PREFIX wd: <http://www.wikidata.org/entity/>
+
+        SELECT ?image WHERE {
+            wd:<ENTITY> wdt:P18 ?image
+        }
+        """.replace(
+            "<ENTITY>", entity_id
+        )
+        responce = request_to_wikidata(query)
+        return responce
+
+    @staticmethod
     def _request_entity_by_label(label):
         query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
@@ -161,6 +193,8 @@ class Entity(_WikiDataSPARQLBase):
                 )
 
             self._label = None
+            self._description = None
+            self._image = None
             self._forward_one_hop_neighbours = None
             self._backward_one_hop_neighbours = None
             self._instance_of = None
@@ -191,6 +225,24 @@ class Entity(_WikiDataSPARQLBase):
             if len(responce) > 0:
                 self._label = responce[0]["label"]["value"]
         return self._label
+
+    @property
+    def description(self):
+        if self._description is None:
+            responce = self._request_description(self.idx)
+            if len(responce) > 0:
+                self._description = [r["description"]["value"] for r in responce]
+
+        return self._description
+
+    @property
+    def image(self):
+        if self._image is None:
+            responce = self._request_image(self.idx)
+            if len(responce) > 0:
+                self._image = [r["image"]["value"] for r in responce]
+
+        return self._image
 
     @property
     def forward_one_hop_neighbours(self):

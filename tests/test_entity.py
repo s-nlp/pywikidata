@@ -7,7 +7,13 @@ class TestEntity:
         assert entity.label == "Paris"
 
         assert hasattr(entity, "label")
+        assert hasattr(entity, "description")
+        assert hasattr(entity, "image")
         assert hasattr(entity, "instance_of")
+
+        assert len(entity.description) > 0
+        assert len(entity.image) > 0
+        assert len(entity.instance_of) > 0
 
     def test_entity_init_from_label(self):
         assert len(Entity.from_label("Paris")) > 0
