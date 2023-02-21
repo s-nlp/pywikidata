@@ -15,6 +15,9 @@ class TestEntity:
         assert len(entity.image) > 0
         assert len(entity.instance_of) > 0
 
+        entity = Entity("Q1058914")
+        assert len(entity.subclass_of) > 0
+
     def test_entity_init_from_label(self):
         assert len(Entity.from_label("Paris")) > 0
 

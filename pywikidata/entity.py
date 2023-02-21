@@ -100,6 +100,20 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         return request_to_wikidata(query)
 
     @staticmethod
+    def _request_subclass_of(entity_id):
+        query = """
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        SELECT DISTINCT ?subclass_of WHERE {
+            wd:<ENTITY> wdt:P279 ?subclass_of
+        }
+        """.replace(
+            "<ENTITY>", entity_id
+        )
+
+        return request_to_wikidata(query)
+
+    @staticmethod
     def _request_label(entity_id):
         query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
@@ -198,6 +212,7 @@ class Entity(_WikiDataSPARQLBase):
             self._forward_one_hop_neighbours = None
             self._backward_one_hop_neighbours = None
             self._instance_of = None
+            self._subclass_of = None
             self.is_property = self.idx[0] == "P"
 
     @classmethod
@@ -303,6 +318,15 @@ class Entity(_WikiDataSPARQLBase):
                 for r in self._request_instance_of(self.idx)
             ]
         return self._instance_of
+
+    @property
+    def subclass_of(self):
+        if self._subclass_of is None:
+            self._subclass_of = [
+                Entity(r["subclass_of"]["value"])
+                for r in self._request_subclass_of(self.idx)
+            ]
+        return self._subclass_of
 
     def __repr__(self):
         if self.is_property:
