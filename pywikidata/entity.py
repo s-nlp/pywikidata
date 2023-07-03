@@ -1,5 +1,6 @@
 import re
 from .utils import request_to_wikidata
+from .attributes import _WikidataAttributes
 
 
 class _WikiDataBase:
@@ -214,6 +215,7 @@ class Entity(_WikiDataSPARQLBase):
             self._instance_of = None
             self._subclass_of = None
             self.is_property = self.idx[0] == "P"
+            self.attributes = _WikidataAttributes(self.idx)
 
     @classmethod
     def from_label(cls, label: str):

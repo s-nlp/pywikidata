@@ -30,3 +30,7 @@ class TestEntity:
         assert len(entity.forward_one_hop_neighbours) > 0
         assert len(entity.backward_one_hop_neighbours) > 0
         assert len(entity.one_hop_neighbours) > 0
+
+    def test_attributes(self):
+        entity = Entity("Q90")
+        assert len(entity.attributes) > 0
