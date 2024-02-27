@@ -177,6 +177,23 @@ class _WikiDataSPARQLBase(_WikiDataBase):
         responce = request_to_wikidata(query)
         return responce
 
+    @staticmethod
+    def _request_aliases(entity_id):
+        query = """
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                PREFIX wd: <http://www.wikidata.org/entity/> 
+                SELECT DISTINCT ?label
+                WHERE {
+                    wd:<ENTITY> skos:altLabel ?label.
+                    FILTER ( lang(?label) = "en" )
+                } 
+                """.replace(
+            "<ENTITY>", entity_id
+        )
+
+        responce = request_to_wikidata(query)
+        return responce
+
 
 class Entity(_WikiDataSPARQLBase):
     """Entity - python wrapper for Wikidata entities and properties
@@ -216,6 +233,7 @@ class Entity(_WikiDataSPARQLBase):
             self._subclass_of = None
             self.is_property = self.idx[0] == "P"
             self.attributes = _WikidataAttributes(self.idx)
+            self._aliases = None
 
     @classmethod
     def from_label(cls, label: str):
@@ -355,3 +373,12 @@ class Entity(_WikiDataSPARQLBase):
             "idx": self.idx,
             "_label": self._label,
         }
+
+    @property
+    def aliases(self):
+        if self._aliases is None:
+            responce = self._request_aliases(self.idx)
+            if len(responce) > 0:
+                self._aliases = [r['label']['value'] for r in responce]
+
+        return self._aliases
